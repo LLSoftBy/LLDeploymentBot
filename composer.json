@@ -1,0 +1,12 @@
+{
+    "name": "guki/lldeploymentbot",
+    "description": "Assistant for deployment-related tasks",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Eugeny Guchek",
+            "email": "eugeny.guchek@llsoft.by"
+        }
+    ],
+    "require": {}
+}

@@ -8,5 +8,10 @@
             "email": "eugeny.guchek@llsoft.by"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "lldb\\": "src"
+        }
+    }
 }

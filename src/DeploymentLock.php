@@ -22,7 +22,7 @@ class DeploymentLock
      * @param array $data
      * @return DeploymentLock
      */
-    public static function createFromArray(array $data)
+    public static function createFromArray(array $data): DeploymentLock
     {
         $lock = new self();
         foreach ($data as $attr => $value) {

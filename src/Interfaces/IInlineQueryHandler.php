@@ -2,13 +2,13 @@
 /**
  * Created by PhpStorm.
  * Author: e.guchek
- * Date: 15/11/18
+ * Date: 17/11/18
  */
 
 namespace lldb\Interfaces;
 
 
-interface ICommand
+interface IInlineQueryHandler
 {
-    public function execute();
+    public function executeInline();
 }

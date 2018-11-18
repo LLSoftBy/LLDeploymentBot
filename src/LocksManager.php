@@ -11,17 +11,17 @@ namespace lldb;
 class LocksManager
 {
 
-    const LLDO_PATH = '/home/guki/lldo/lldo.php';
+    private const LLDO_PATH = '/home/guki/lldo/lldo.php';
 
-    public function getLocksByPlatform($platform)
+    public function getLocksByPlatform($platform): array
     {
         $lldoParams = '-p '.$platform;
-        $rawLocksData = $this->lldoCall('deploy:list-locks', $lldoParams);
-        //$rawLocksData = '[{"id":"5bc90244000f8337889810","owner":"guki","tgUserId":null,"created":1539899971},{"id":"5bc90253c2614604544950","owner":"guki","tgUserId":null,"created":1539899987}]';
+        //$rawLocksData = $this->lldoCall('deploy:list-locks', $lldoParams);
+        $rawLocksData = '[{"id":"5bc90244000f8337889810","owner":"guki","tgUserId":null,"created":1539899971},{"id":"5bc90253c2614604544950","owner":"guki","tgUserId":null,"created":1539899987}]';
 
         $locks = json_decode($rawLocksData, true);
 
-        if (!is_array($locks)) {
+        if (!\is_array($locks)) {
             $message = sprintf('Unable to list locks for platform %s. Unexpected result: %s',
                 $platform,
                 $rawLocksData
@@ -37,7 +37,7 @@ class LocksManager
         return $results;
     }
 
-    public function setLock($platform, $tgId, $name)
+    public function setLock($platform, $tgId, $name): bool
     {
         $platformLocks = $this->getLocksByPlatform($platform);
         if (!$this->getOwnLockId($platformLocks, $tgId)) {

@@ -12,7 +12,7 @@ class DeploymentLock
 
     public function __construct()
     {
-        $this->id = str_replace('.', '', uniqid('', true));
+        $this->id = uniqid('', false);
         $this->created = time();
     }
 

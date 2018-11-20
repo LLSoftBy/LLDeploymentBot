@@ -50,22 +50,27 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
 
     public function executeInline()
     {
-        $callbackData = $this->bot->Callback_Data();
-
+        $rawCallbackData = $this->bot->Callback_Data();
+        $callbackData = json_decode($rawCallbackData, true);
         $action = $callbackData['a'];
-        $tgId = $this->bot->UserID();
         $platform = $callbackData['p'];
-        $platformLocks = $this->locksManager->getLocksByPlatform($platform);
-        $ownLockId = $this->locksManager->getOwnLockId($platformLocks, $tgId);
+        $chatId = $this->bot->ChatID();
+        $messageId = $this->bot->MessageID();
+        $waitMessage = $this->getWaitMessageContent();
+        $waitMessage['message_id'] = $messageId;
+        $waitMessage['chat_id'] = $chatId;
+        $result = $this->bot->editMessageText($waitMessage);
 
+        $typingAction = ['chat_id' => $chatId, 'action' => 'typing'];
+        $this->bot->sendChatAction($typingAction);
         switch ($action) {
             case '+':
-                if (!$ownLockId) {
-                    $name = $this->bot->Username();
-                    $this->locksManager->setLock($platform, $tgId, $name);
-                }
+                $tgId = $this->bot->UserID();
+                $name = trim($this->bot->FirstName() . ' ' . $this->bot->LastName());
+                $this->locksManager->setLock($platform, $tgId, $name);
                 break;
             case '-':
+                $ownLockId = $callbackData['l'];
                 if ($ownLockId) {
                     $this->locksManager->removeLock($platform, $ownLockId);
                 }
@@ -74,11 +79,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
                 throw new \RuntimeException('Unknown callback action ' . $action);
         }
 
-        $inlineQuery = $this->bot->Inline_Query();
-        $messageId = $inlineQuery['id'];
         $newMessage = $this->getPlatformMessageContent($platform);
-        $newMessage['inline_message_id'] = $messageId;
-        $this->bot->editMessageText($newMessage);
+        $newMessage['message_id'] = $messageId;
+        $newMessage['chat_id'] = $chatId;
+        $result = $this->bot->editMessageText($newMessage);
+
+        return true;
     }
 
     public function getFormattedPlatformMessage($platform)
@@ -106,13 +112,24 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
             $myLockId = $this->locksManager->getOwnLockId($platformLocks, $tgId);
 
             $button = $myLockId ?
-                $this->getUnlockButton($platform, $tgId, $myLockId) :
-                $this->getLockButton($platform, $tgId);
+                $this->getUnlockButton($platform, $myLockId) :
+                $this->getLockButton($platform);
 
             $markup = $this->bot->buildInlineKeyBoard([[$button]]);
 
             $content['reply_markup'] = $markup;
         }
+
+        return $content;
+    }
+
+    public function getWaitMessageContent()
+    {
+        $btn = $this->getWaitButton();
+        $content = [
+            'text' => 'Confirming...',
+            'reply_markup' => $this->bot->buildInlineKeyBoard([[$btn]])
+        ];
 
         return $content;
     }
@@ -138,25 +155,32 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
 
     public function getLockDescription(DeploymentLock $lock)
     {
-        return sprintf('%s, %s',
+        return sprintf('%s at %s',
             $lock->owner,
-            $lock->created
+            date('Y-m-d H:i:s', $lock->created)
         );
     }
 
-    private function getUnlockButton(string $platform, string $tgId, string $lockId)
+    private function getUnlockButton(string $platform, string $lockId)
     {
-        $value = json_encode(['t' => 'lck', 'a' => '-', 'p' => $platform, 'tgId' => $tgId, 'lockId' => $lockId]);
+        $value = json_encode(['t' => 'lck', 'a' => '-', 'p' => $platform, 'l' => $lockId]);
         $platformAlias = $this->getPlatformAlias($platform);
         $btn = $this->bot->buildInlineKeyboardButton('Unlock ' . $platformAlias, '', $value);
         return $btn;
     }
 
-    private function getLockButton(string $platform, string $tgId)
+    private function getLockButton(string $platform)
     {
-        $value = json_encode(['t' => 'lck', 'a' => '+', 'p' => $platform, 'tgId' => $tgId]);
+        $value = json_encode(['t' => 'lck', 'a' => '+', 'p' => $platform]);
         $platformAlias = $this->getPlatformAlias($platform);
         $btn = $this->bot->buildInlineKeyboardButton('Lock ' . $platformAlias, '', $value);
+        return $btn;
+    }
+
+    private function getWaitButton()
+    {
+        $value = json_encode(['t' => 'nop']);
+        $btn = $this->bot->buildInlineKeyboardButton('⏳', '', $value);
         return $btn;
     }
 

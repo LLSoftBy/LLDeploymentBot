@@ -9,10 +9,11 @@
             "email": "eugeny.guchek@llsoft.by"
         }
     ],
+    "require-dev": {
+        "roave/security-advisories": "dev-master"
+    },
     "require": {
-      "roave/security-advisories": "dev-master"
-      ,
-      "eleirbag89/telegrambotphp": "^1.3",
+        "eleirbag89/telegrambotphp": "^1.3",
         "ext-json": "*"
     },
     "autoload": {

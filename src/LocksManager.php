@@ -16,8 +16,9 @@ class LocksManager
     public function getLocksByPlatform($platform): array
     {
         $lldoParams = '-p '.$platform;
-        //$rawLocksData = $this->lldoCall('deploy:list-locks', $lldoParams);
-        $rawLocksData = '[{"id":"5bc90244000f8337889810","owner":"guki","tgUserId":null,"created":1539899971},{"id":"5bc90253c2614604544950","owner":"guki","tgUserId":null,"created":1539899987}]';
+        $rawLocksData = $this->lldoCall('deploy:list-locks', $lldoParams);
+        //$rawLocksData = '[{"id":"5bc90244000f8337889810","owner":"guki","tgUserId":176696425,"created":1539899971},{"id":"5bc90253c2614604544950","owner":"guki","tgUserId":null,"created":1539899987}]';
+        //$rawLocksData = '[{"id":"5bc90244000f8337889810","owner":"guki","tgUserId":null,"created":1539899971},{"id":"5bc90253c2614604544950","owner":"guki","tgUserId":null,"created":1539899987}]';
 
         $locks = json_decode($rawLocksData, true);
 
@@ -60,7 +61,7 @@ class LocksManager
             $lockId
         );
 
-        $this->lldoCall('deploy:set-lock', $lldoParams);
+        $this->lldoCall('deploy:delete-lock', $lldoParams);
 
         return true;
     }
@@ -70,7 +71,7 @@ class LocksManager
         $ownLockId = null;
         /** @var DeploymentLock $lock */
         foreach ($locks as $lock) {
-            if ($lock->tgUserId === $tgId) {
+            if ((int)$lock->tgUserId === (int)$tgId) {
                 $ownLockId = $lock->id;
                 break;
             }
@@ -87,6 +88,7 @@ class LocksManager
         $lldoCall = self::LLDO_PATH . ' ' . $command . ' ' . $params;
 
         $result = exec($lldoCall);
+        //$result = '';
 
         return $result;
     }

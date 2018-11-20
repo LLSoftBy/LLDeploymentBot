@@ -29,7 +29,6 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
     public function __construct(Telegram $bot)
     {
         $this->bot = $bot;
-        // todo: use DI
         $this->locksManager = new LocksManager();
     }
 
@@ -113,9 +112,10 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
 
         $messageText .= $this->getLocksDescription($platformLocks);
 
-        $tgId = $this->bot->UserID();
+        $isGroupMessage = $this->bot->messageFromGroup();
         $content = ['text' => $messageText, 'parse_mode' => 'Markdown'];
-        if ($tgId) {
+        if (!$isGroupMessage) {
+            $tgId = $this->bot->UserID();
             $myLockId = $this->locksManager->getOwnLockId($platformLocks, $tgId);
 
             $button = $myLockId ?

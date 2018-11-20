@@ -11,4 +11,5 @@ namespace lldb\Interfaces;
 interface ICommandHandler
 {
     public function execute();
+    public function getDescription();
 }

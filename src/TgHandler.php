@@ -9,13 +9,15 @@ namespace lldb;
 
 
 use lldb\Commands\LocksCommand;
+use lldb\Commands\StartCommand;
 use lldb\Interfaces\ICommandHandler;
 use lldb\Interfaces\IInlineQueryHandler;
 
 class TgHandler
 {
     private static $commandHandlers = [
-        '/locks' => LocksCommand::class
+        '/start' => StartCommand::class,
+        '/locks' => LocksCommand::class,
     ];
 
     private static $inlineQueryHandlers = [
@@ -57,6 +59,11 @@ class TgHandler
         }
 
         return true;
+    }
+
+    public static function getCommandHandlers()
+    {
+        return self::$commandHandlers;
     }
 
     private static function isCommand(\Telegram $telegram): bool

@@ -33,6 +33,11 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         $this->locksManager = new LocksManager();
     }
 
+    public function getDescription()
+    {
+        return 'View and edit platform locks';
+    }
+
     public function execute()
     {
         $chatId = $this->bot->ChatID();
@@ -56,6 +61,7 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         $platform = $callbackData['p'];
         $chatId = $this->bot->ChatID();
         $messageId = $this->bot->MessageID();
+
         $waitMessage = $this->getWaitMessageContent();
         $waitMessage['message_id'] = $messageId;
         $waitMessage['chat_id'] = $chatId;
@@ -63,6 +69,7 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
 
         $typingAction = ['chat_id' => $chatId, 'action' => 'typing'];
         $this->bot->sendChatAction($typingAction);
+
         switch ($action) {
             case '+':
                 $tgId = $this->bot->UserID();

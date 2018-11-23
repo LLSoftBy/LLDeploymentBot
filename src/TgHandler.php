@@ -24,6 +24,12 @@ class TgHandler
         'locks' => LocksCommand::class
     ];
 
+    /**
+     * Process incoming telegram request
+     *
+     * @param \Telegram $telegram
+     * @return bool
+     */
     public static function handle(\Telegram $telegram)
     {
         if (self::isInlineQuery($telegram)) {
@@ -61,11 +67,22 @@ class TgHandler
         return true;
     }
 
+    /**
+     * Returns list of registered command handlers
+     *
+     * @return array
+     */
     public static function getCommandHandlers()
     {
         return self::$commandHandlers;
     }
 
+    /**
+     * Returns if incoming request is command
+     *
+     * @param \Telegram $telegram
+     * @return bool
+     */
     private static function isCommand(\Telegram $telegram): bool
     {
         $text = $telegram->Text();
@@ -73,6 +90,25 @@ class TgHandler
         return \is_string($text) && '' !== $text && $text[0] === '/';
     }
 
+    /**
+     * Returns if incoming request is inline query
+     *
+     * @param \Telegram $telegram
+     * @return bool
+     */
+    private static function isInlineQuery(\Telegram $telegram)
+    {
+        $updateType = $telegram->getUpdateType();
+        return $telegram::CALLBACK_QUERY === $updateType;
+    }
+
+
+    /**
+     * Returns command handler for incoming request
+     *
+     * @param \Telegram $telegram
+     * @return ICommandHandler|null
+     */
     private static function getCommandHandler(\Telegram $telegram)
     {
         $handler = null;
@@ -85,6 +121,12 @@ class TgHandler
         return $handler;
     }
 
+    /**
+     * Returns inline query handler for incoming request
+     *
+     * @param \Telegram $telegram
+     * @return IInlineQueryHandler|null
+     */
     private static function getInlineQueryHandler(\Telegram $telegram)
     {
         $handler = null;
@@ -97,12 +139,12 @@ class TgHandler
         return $handler;
     }
 
-    private static function isInlineQuery(\Telegram $telegram)
-    {
-        $updateType = $telegram->getUpdateType();
-        return $telegram::CALLBACK_QUERY === $updateType;
-    }
-
+    /**
+     * Sends callback query confirmation
+     *
+     * @param \Telegram $telegram
+     * @return bool
+     */
     private static function confirmInlineQuery(\Telegram $telegram)
     {
         $queryId = $telegram->Callback_ID();

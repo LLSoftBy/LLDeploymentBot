@@ -13,6 +13,12 @@ class LocksManager
 
     private const LLDO_PATH = Config::LLDO_PATH;
 
+    /**
+     * Returns platform locks
+     *
+     * @param $platform
+     * @return array Array of DeploymentLock
+     */
     public function getLocksByPlatform($platform): array
     {
         $lldoParams = '-p '.$platform;
@@ -38,6 +44,14 @@ class LocksManager
         return $results;
     }
 
+    /**
+     * Sets lock by id
+     *
+     * @param string $platform
+     * @param string $tgId Telegram id of lock owner
+     * @param string $name Name of lock owner
+     * @return bool
+     */
     public function setLock($platform, $tgId, $name): bool
     {
         $platformLocks = $this->getLocksByPlatform($platform);
@@ -54,6 +68,13 @@ class LocksManager
         return true;
     }
 
+    /**
+     * Removes lock by id
+     *
+     * @param string $platform
+     * @param string $lockId
+     * @return bool
+     */
     public function removeLock($platform, $lockId)
     {
         $lldoParams = sprintf('-p %s %s',
@@ -66,6 +87,13 @@ class LocksManager
         return true;
     }
 
+    /**
+     * Returns id of lock by telegram id
+     *
+     * @param array $locks Array of DeploymentLock
+     * @param string $tgId telegram id
+     * @return null|string
+     */
     public function getOwnLockId($locks, $tgId)
     {
         $ownLockId = null;
@@ -79,6 +107,14 @@ class LocksManager
 
         return $ownLockId;
     }
+
+    /**
+     * Implements lldo call
+     *
+     * @param string $command
+     * @param string $params
+     * @return string
+     */
     protected function lldoCall($command, $params = '')
     {
         if (!file_exists(self::LLDO_PATH)) {

@@ -21,5 +21,5 @@ if (false !== strpos($subject, '#deployment')) {
 $telegram = new Telegram(lldb\Config::BOT_TOKEN);
 
 $locksCommand = new \lldb\Commands\LocksCommand($telegram);
-$message = ['text' => $subject];
+$message = ['text' => $subject, 'parse_mode' => 'HTML'];
 $locksCommand->notifyGroup($message);

@@ -114,7 +114,10 @@ class TgHandler
         $handler = null;
         $text = $telegram->Text();
         $words = explode(' ', $text);
-        $command = $words[0];
+        $commandAndBotname = $words[0];
+        $cleanCommand = explode('@', $commandAndBotname);
+        $command = $cleanCommand[0];
+
         if (array_key_exists($command, self::$commandHandlers)) {
             $handler = self::$commandHandlers[$command];
         }

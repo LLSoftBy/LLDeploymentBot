@@ -194,7 +194,7 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $btn;
     }
 
-    private function notifyGroup(array $content)
+    public function notifyGroup(array $content)
     {
         $groupId = Config::NOTIFICATIONS_GROUP_ID;
         if ($groupId) {

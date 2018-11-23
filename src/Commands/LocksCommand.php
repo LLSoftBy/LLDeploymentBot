@@ -8,6 +8,7 @@
 namespace lldb\Commands;
 
 
+use lldb\Config;
 use lldb\DeploymentLock;
 use lldb\Interfaces\ICommandHandler;
 use lldb\Interfaces\IInlineQueryHandler;
@@ -85,10 +86,11 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
                 throw new \RuntimeException('Unknown callback action ' . $action);
         }
 
-        $newMessage = $this->getPlatformMessageContent($platform);
+        $newMessage = $this->getPlatformMessageContent($platform, true);
         $newMessage['message_id'] = $messageId;
         $newMessage['chat_id'] = $chatId;
         $result = $this->bot->editMessageText($newMessage);
+        $this->notifyGroup($newMessage);
 
         return true;
     }
@@ -96,13 +98,14 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
     public function getFormattedPlatformMessage($platform)
     {
         $chatId = $this->bot->ChatID();
-        $content = $this->getPlatformMessageContent($platform);
+        $isGroupMessage = $this->bot->messageFromGroup();
+        $content = $this->getPlatformMessageContent($platform, !$isGroupMessage);
         $content['chat_id'] = $chatId;
 
         return $content;
     }
 
-    public function getPlatformMessageContent($platform)
+    public function getPlatformMessageContent($platform, $showButton)
     {
         $platformAlias = $this->getPlatformAlias($platform);
         $messageText = sprintf('*%s*', $platformAlias) . PHP_EOL;
@@ -112,9 +115,9 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
 
         $messageText .= $this->getLocksDescription($platformLocks);
 
-        $isGroupMessage = $this->bot->messageFromGroup();
+
         $content = ['text' => $messageText, 'parse_mode' => 'Markdown'];
-        if (!$isGroupMessage) {
+        if ($showButton) {
             $tgId = $this->bot->UserID();
             $myLockId = $this->locksManager->getOwnLockId($platformLocks, $tgId);
 
@@ -189,6 +192,18 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         $value = json_encode(['t' => 'nop']);
         $btn = $this->bot->buildInlineKeyboardButton('⏳', '', $value);
         return $btn;
+    }
+
+    private function notifyGroup(array $content)
+    {
+        $groupId = Config::NOTIFICATIONS_GROUP_ID;
+        if ($groupId) {
+            unset($content['reply_markup']);
+            $content['chat_id'] = $groupId;
+            $result = $this->bot->sendMessage($content);
+        }
+
+        return true;
     }
 
 }

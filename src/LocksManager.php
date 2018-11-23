@@ -11,7 +11,7 @@ namespace lldb;
 class LocksManager
 {
 
-    private const LLDO_PATH = '/home/guki/lldo/lldo.php';
+    private const LLDO_PATH = Config::LLDO_PATH;
 
     public function getLocksByPlatform($platform): array
     {

@@ -2,8 +2,6 @@
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-$botToken = '596175715:AAGeXYi1XUMGFGYht5lfCtyd2lCaztOLBrE';
-$telegram = new Telegram($botToken);
+$telegram = new Telegram(lldb\Config::BOT_TOKEN);
 
 \lldb\TgHandler::handle($telegram);
-echo 'zz';

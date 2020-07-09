@@ -10,6 +10,17 @@ namespace lldb\Interfaces;
 
 interface ICommandHandler
 {
+    /**
+     * Command handler
+     *
+     * @return bool
+     */
     public function execute();
+
+    /**
+     * Returns description of command
+     *
+     * @return string
+     */
     public function getDescription();
 }

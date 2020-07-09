@@ -33,11 +33,17 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         $this->locksManager = new LocksManager();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDescription()
     {
         return 'View and edit platform locks';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function execute()
     {
         $chatId = $this->bot->ChatID();
@@ -53,6 +59,9 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function executeInline()
     {
         $rawCallbackData = $this->bot->Callback_Data();
@@ -67,7 +76,7 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         $waitMessage['chat_id'] = $chatId;
         $result = $this->bot->editMessageText($waitMessage);
 
-        $typingAction = ['chat_id' => $chatId, 'action' => 'typing'];
+        //$typingAction = ['chat_id' => $chatId, 'action' => 'typing'];
         //$this->bot->sendChatAction($typingAction);
 
         switch ($action) {
@@ -95,6 +104,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return true;
     }
 
+    /**
+     * Returns ready to send message for platform
+     *
+     * @param string $platform i.e. /QA/DEV
+     * @return array Message data
+     */
     public function getFormattedPlatformMessage($platform)
     {
         $chatId = $this->bot->ChatID();
@@ -105,6 +120,13 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $content;
     }
 
+    /**
+     * Returns message text and inline markup
+     *
+     * @param string $platform
+     * @param bool $showButton
+     * @return array
+     */
     public function getPlatformMessageContent($platform, $showButton)
     {
         $platformAlias = $this->getPlatformAlias($platform);
@@ -133,6 +155,11 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $content;
     }
 
+    /**
+     * Returns temporary message, while another command executing
+     *
+     * @return array Message data
+     */
     public function getWaitMessageContent()
     {
         $btn = $this->getWaitButton();
@@ -144,6 +171,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $content;
     }
 
+    /**
+     * Returns short platform name by full name
+     *
+     * @param string $platform i.e. /QA/DEV
+     * @return string
+     */
     public function getPlatformAlias($platform)
     {
         if (!array_key_exists($platform, $this->availablePlatforms)) {
@@ -153,6 +186,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $this->availablePlatforms[$platform];
     }
 
+    /**
+     * Returns locks data as string
+     *
+     * @param array $locks
+     * @return string
+     */
     public function getLocksDescription(array $locks)
     {
         $description = '';
@@ -163,6 +202,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $description;
     }
 
+    /**
+     * Return locks data as string
+     *
+     * @param DeploymentLock $lock
+     * @return string
+     */
     public function getLockDescription(DeploymentLock $lock)
     {
         return sprintf('%s at %s',
@@ -171,6 +216,13 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         );
     }
 
+    /**
+     * Returns inline button for platform unlock
+     *
+     * @param string $platform
+     * @param string $lockId
+     * @return array
+     */
     private function getUnlockButton(string $platform, string $lockId)
     {
         $value = json_encode(['t' => 'lck', 'a' => '-', 'p' => $platform, 'l' => $lockId]);
@@ -179,6 +231,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $btn;
     }
 
+    /**
+     * Returns inline button for platform lock
+     *
+     * @param string $platform
+     * @return array
+     */
     private function getLockButton(string $platform)
     {
         $value = json_encode(['t' => 'lck', 'a' => '+', 'p' => $platform]);
@@ -187,6 +245,11 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $btn;
     }
 
+    /**
+     * Returns button with sandglass for temporary message
+     *
+     * @return array
+     */
     private function getWaitButton()
     {
         $value = json_encode(['t' => 'nop']);
@@ -194,6 +257,12 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         return $btn;
     }
 
+    /**
+     * Sends notification about to group
+     *
+     * @param array $content Message data
+     * @return bool
+     */
     public function notifyGroup(array $content)
     {
         $groupId = Config::NOTIFICATIONS_GROUP_ID;

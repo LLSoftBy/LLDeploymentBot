@@ -10,5 +10,10 @@ namespace lldb\Interfaces;
 
 interface IInlineQueryHandler
 {
+    /**
+     * Inline query handler
+     *
+     * @return bool
+     */
     public function executeInline();
 }

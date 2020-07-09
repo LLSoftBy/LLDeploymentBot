@@ -21,6 +21,9 @@ class StartCommand implements ICommandHandler
         $this->bot = $bot;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function execute()
     {
         $chatId = $this->bot->ChatID();
@@ -51,6 +54,9 @@ class StartCommand implements ICommandHandler
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDescription()
     {
         return 'Returns list of available commands';

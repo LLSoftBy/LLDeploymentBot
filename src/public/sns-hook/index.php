@@ -14,12 +14,12 @@ if (!$deploymentData) {
 
 $subject = $deploymentData->Subject;
 if (false !== strpos($subject, '#deployment')) {
-    $subject .= '<pre>' . PHP_EOL . $deploymentData->Message . PHP_EOL . '</pre>';
+    $subject .= '<pre>' . PHP_EOL . $deploymentData->Message . '</pre>';
     $subject = str_replace(' ', ' ', $subject);
 }
 
 $telegram = new Telegram(lldb\Config::BOT_TOKEN);
 
 $locksCommand = new \lldb\Commands\LocksCommand($telegram);
-$message = ['text' => $subject];
+$message = ['text' => $subject, 'parse_mode' => 'HTML'];
 $locksCommand->notifyGroup($message);

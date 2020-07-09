@@ -68,7 +68,7 @@ class LocksCommand implements ICommandHandler, IInlineQueryHandler
         $result = $this->bot->editMessageText($waitMessage);
 
         $typingAction = ['chat_id' => $chatId, 'action' => 'typing'];
-        $this->bot->sendChatAction($typingAction);
+        //$this->bot->sendChatAction($typingAction);
 
         switch ($action) {
             case '+':
